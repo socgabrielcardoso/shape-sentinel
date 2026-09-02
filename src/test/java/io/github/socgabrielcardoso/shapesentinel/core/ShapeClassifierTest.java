@@ -53,3 +53,14 @@ class ShapeClassifierTest {
         assertEquals(0, result.confidence());
     }
 }
+
+
+/*
+nao fique horrorizado com a organizaçao
+pra quem quiser testar rode:
+git clone https://github.com/socgabrielcardoso/shape-sentinel.git
+cd shape-sentinel
+mvn clean package
+java -jar target/shape-sentinel.jar
+*/
+         
