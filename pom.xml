@@ -30,6 +30,15 @@
         </dependency>
     </dependencies>
 
+*/
+nao fique horrorizado com a organizaçao
+pra quem quiser testar rode:
+git clone https://github.com/socgabrielcardoso/shape-sentinel.git
+cd shape-sentinel
+mvn clean package
+java -jar target/shape-sentinel.jar
+*/
+         
     <build>
         <finalName>shape-sentinel</finalName>
         <plugins>
