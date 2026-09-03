@@ -19,6 +19,7 @@ import javax.swing.UIManager;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
@@ -106,26 +107,35 @@ public final class MainWindow extends JFrame implements CameraService.FrameListe
         controls.setOpaque(false);
         cameraIndex.setPreferredSize(new Dimension(72, 28));
         cameraIndex.setMaximumSize(new Dimension(72, 28));
+        cameraIndex.setToolTipText("Select the camera before starting");
+        cameraIndex.getAccessibleContext().setAccessibleName("Camera index");
         controls.add(buildControl("CAMERA", cameraIndex, null));
         controls.add(Box.createHorizontalStrut(20));
 
         JSlider areaSlider = new JSlider(300, 8_000, 1_200);
         configureSlider(areaSlider, 180);
+        areaSlider.setToolTipText("Ignore contours smaller than this area");
+        areaSlider.getAccessibleContext().setAccessibleName("Minimum shape area");
         controls.add(buildControl("MIN AREA", areaSlider, areaValue));
         controls.add(Box.createHorizontalStrut(20));
 
         JSlider edgeSlider = new JSlider(20, 180, 70);
         configureSlider(edgeSlider, 160);
+        edgeSlider.setToolTipText("Adjust the edge detection threshold");
+        edgeSlider.getAccessibleContext().setAccessibleName("Edge sensitivity");
         controls.add(buildControl("SENSITIVITY", edgeSlider, edgeValue));
 
         styleValue(areaValue);
         styleValue(edgeValue);
         styleButton(cameraButton);
+        cameraButton.setMnemonic(KeyEvent.VK_C);
+        cameraButton.setToolTipText("Start or stop real-time detection");
         controls.add(Box.createHorizontalGlue());
         controls.add(cameraButton);
 
         status.setForeground(AppTheme.MUTED);
         status.setFont(AppTheme.font(Font.PLAIN, 12));
+        status.getAccessibleContext().setAccessibleName("Camera status");
 
         areaSlider.addChangeListener(event -> updateSettings(areaSlider, edgeSlider));
         edgeSlider.addChangeListener(event -> updateSettings(areaSlider, edgeSlider));
