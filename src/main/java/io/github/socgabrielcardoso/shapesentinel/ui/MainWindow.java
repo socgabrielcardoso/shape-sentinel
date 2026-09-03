@@ -54,7 +54,7 @@ public final class MainWindow extends JFrame implements CameraService.FrameListe
 
     public void open() {
         setVisible(true);
-        cameraService.start((Integer) cameraIndex.getValue());
+        startCamera();
     }
 
     private void configureLookAndFeel() {
@@ -175,11 +175,25 @@ public final class MainWindow extends JFrame implements CameraService.FrameListe
     private void toggleCamera() {
         if (cameraService.isRunning()) {
             cameraService.stop();
-            cameraButton.setText("START CAMERA");
-            status.setText("Camera stopped");
+            applyCameraState("Camera stopped", false);
         } else {
-            cameraButton.setText("STOP CAMERA");
-            cameraService.start((Integer) cameraIndex.getValue());
+            startCamera();
+        }
+    }
+
+    private void startCamera() {
+        int index = (Integer) cameraIndex.getValue();
+        applyCameraState("Connecting to camera " + index, true);
+        cameraService.start(index);
+    }
+
+    private void applyCameraState(String message, boolean active) {
+        status.setText(message);
+        cameraButton.setText(active ? "STOP CAMERA" : "START CAMERA");
+        cameraIndex.setEnabled(!active);
+        if (!active) {
+            pendingFrame.set(null);
+            videoPanel.clearFrame();
         }
     }
 
@@ -228,10 +242,7 @@ public final class MainWindow extends JFrame implements CameraService.FrameListe
 
     @Override
     public void onState(String message, boolean active) {
-        SwingUtilities.invokeLater(() -> {
-            status.setText(message);
-            cameraButton.setText(active ? "STOP CAMERA" : "START CAMERA");
-        });
+        SwingUtilities.invokeLater(() -> applyCameraState(message, active));
     }
 
     private record FrameUpdate(BufferedImage image, CameraService.FrameStats stats) {

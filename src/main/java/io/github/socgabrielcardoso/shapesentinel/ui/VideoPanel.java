@@ -21,6 +21,11 @@ final class VideoPanel extends JPanel {
         repaint();
     }
 
+    void clearFrame() {
+        frame = null;
+        repaint();
+    }
+
     @Override
     protected void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
