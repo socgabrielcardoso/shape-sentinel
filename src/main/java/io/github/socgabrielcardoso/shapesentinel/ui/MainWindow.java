@@ -32,7 +32,7 @@ public final class MainWindow extends JFrame implements CameraService.FrameListe
     private static final Color ACCENT = new Color(78, 224, 181);
 
     private final AtomicReference<DetectionSettings> settings =
-            new AtomicReference<>(new DetectionSettings(1_200, 70));
+            new AtomicReference<>(DetectionSettings.defaults());
     private final VideoPanel videoPanel = new VideoPanel();
     private final JLabel status = new JLabel("Initializing camera");
     private final JLabel areaValue = new JLabel("1200 px");
