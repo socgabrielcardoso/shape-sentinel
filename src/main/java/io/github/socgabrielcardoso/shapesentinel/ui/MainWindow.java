@@ -28,6 +28,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 public final class MainWindow extends JFrame implements CameraService.FrameListener {
+    private static final long serialVersionUID = 1L;
+
     private final AtomicReference<DetectionSettings> settings =
             new AtomicReference<>(DetectionSettings.defaults());
     private final AtomicReference<FrameUpdate> pendingFrame = new AtomicReference<>();

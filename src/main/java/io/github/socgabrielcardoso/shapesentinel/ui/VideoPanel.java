@@ -9,6 +9,8 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
 final class VideoPanel extends JPanel {
+    private static final long serialVersionUID = 1L;
+
     private volatile BufferedImage frame;
 
     VideoPanel() {
