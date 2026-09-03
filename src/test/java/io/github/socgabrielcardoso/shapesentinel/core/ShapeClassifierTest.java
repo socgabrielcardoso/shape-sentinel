@@ -52,4 +52,12 @@ class ShapeClassifierTest {
         assertEquals(ShapeType.UNKNOWN, result.type());
         assertEquals(0, result.confidence());
     }
+
+    @Test
+    void rejectsNonFiniteGeometry() {
+        ShapeAssessment result = classifier.classify(4, Double.NaN, 200, 50, 50, true);
+
+        assertEquals(ShapeType.UNKNOWN, result.type());
+        assertEquals(0, result.confidence());
+    }
 }

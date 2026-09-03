@@ -9,7 +9,7 @@ public final class ShapeClassifier {
             double height,
             boolean convex
     ) {
-        if (vertices < 3 || area <= 0 || perimeter <= 0 || width <= 0 || height <= 0) {
+        if (vertices < 3 || hasInvalidGeometry(area, perimeter, width, height)) {
             return new ShapeAssessment(ShapeType.UNKNOWN, 0);
         }
 
@@ -41,5 +41,16 @@ public final class ShapeClassifier {
             return new ShapeAssessment(ShapeType.CIRCLE, confidence);
         }
         return new ShapeAssessment(ShapeType.POLYGON, 0.72);
+    }
+
+    private boolean hasInvalidGeometry(double area, double perimeter, double width, double height) {
+        return !Double.isFinite(area)
+                || !Double.isFinite(perimeter)
+                || !Double.isFinite(width)
+                || !Double.isFinite(height)
+                || area <= 0
+                || perimeter <= 0
+                || width <= 0
+                || height <= 0;
     }
 }
