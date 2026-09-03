@@ -4,7 +4,10 @@ import io.github.socgabrielcardoso.shapesentinel.camera.CameraService;
 import io.github.socgabrielcardoso.shapesentinel.core.DetectionSettings;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -15,7 +18,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -94,30 +96,31 @@ public final class MainWindow extends JFrame implements CameraService.FrameListe
     }
 
     private JPanel buildFooter() {
-        JPanel footer = new JPanel(new BorderLayout());
+        JPanel footer = new JPanel(new BorderLayout(0, 12));
         footer.setBackground(AppTheme.SURFACE);
-        footer.setBorder(BorderFactory.createEmptyBorder(12, 18, 12, 18));
+        footer.setBorder(BorderFactory.createEmptyBorder(14, 20, 12, 20));
 
-        JPanel controls = new JPanel(new FlowLayout(FlowLayout.LEFT, 14, 0));
+        JPanel controls = new JPanel();
+        controls.setLayout(new BoxLayout(controls, BoxLayout.X_AXIS));
         controls.setOpaque(false);
-        controls.add(label("CAMERA"));
-        controls.add(cameraIndex);
+        cameraIndex.setPreferredSize(new Dimension(72, 28));
+        cameraIndex.setMaximumSize(new Dimension(72, 28));
+        controls.add(buildControl("CAMERA", cameraIndex, null));
+        controls.add(Box.createHorizontalStrut(20));
 
         JSlider areaSlider = new JSlider(300, 8_000, 1_200);
-        configureSlider(areaSlider, 140);
-        controls.add(label("MIN AREA"));
-        controls.add(areaSlider);
-        controls.add(areaValue);
+        configureSlider(areaSlider, 180);
+        controls.add(buildControl("MIN AREA", areaSlider, areaValue));
+        controls.add(Box.createHorizontalStrut(20));
 
         JSlider edgeSlider = new JSlider(20, 180, 70);
-        configureSlider(edgeSlider, 120);
-        controls.add(label("SENSITIVITY"));
-        controls.add(edgeSlider);
-        controls.add(edgeValue);
+        configureSlider(edgeSlider, 160);
+        controls.add(buildControl("SENSITIVITY", edgeSlider, edgeValue));
 
         styleValue(areaValue);
         styleValue(edgeValue);
         styleButton(cameraButton);
+        controls.add(Box.createHorizontalGlue());
         controls.add(cameraButton);
 
         status.setForeground(AppTheme.MUTED);
@@ -132,6 +135,22 @@ public final class MainWindow extends JFrame implements CameraService.FrameListe
         return footer;
     }
 
+    private JPanel buildControl(String title, JComponent component, JLabel value) {
+        JPanel control = new JPanel(new BorderLayout(8, 4));
+        control.setOpaque(false);
+
+        JPanel heading = new JPanel(new BorderLayout());
+        heading.setOpaque(false);
+        heading.add(label(title), BorderLayout.WEST);
+        if (value != null) {
+            heading.add(value, BorderLayout.EAST);
+        }
+
+        control.add(heading, BorderLayout.NORTH);
+        control.add(component, BorderLayout.CENTER);
+        return control;
+    }
+
     private JLabel label(String text) {
         JLabel label = new JLabel(text);
         label.setForeground(AppTheme.MUTED);
@@ -141,6 +160,7 @@ public final class MainWindow extends JFrame implements CameraService.FrameListe
 
     private void configureSlider(JSlider slider, int width) {
         slider.setPreferredSize(new Dimension(width, 28));
+        slider.setMaximumSize(new Dimension(width, 28));
         slider.setOpaque(false);
         slider.setFocusable(false);
     }
