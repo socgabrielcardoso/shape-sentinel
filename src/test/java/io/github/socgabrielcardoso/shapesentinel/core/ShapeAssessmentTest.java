@@ -16,4 +16,12 @@ class ShapeAssessmentTest {
     void requiresShapeType() {
         assertThrows(NullPointerException.class, () -> new ShapeAssessment(null, 0.5));
     }
+
+    @Test
+    void rejectsNonFiniteConfidence() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new ShapeAssessment(ShapeType.UNKNOWN, Double.NaN)
+        );
+    }
 }
