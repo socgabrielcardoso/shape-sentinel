@@ -38,8 +38,12 @@
             <div class="viewer" aria-label="Shape detection interface preview">
                 <div class="viewer-bar">
                     <span>camera.preview</span>
-                    <span class="live-state">SIMULATED FEED</span>
+                    <div class="viewer-actions">
+                        <span class="live-state" id="feed-state" aria-live="polite">SIMULATED FEED</span>
+                        <button class="camera-toggle" id="camera-toggle" type="button">USE CAMERA</button>
+                    </div>
                 </div>
+                <video id="camera-source" muted playsinline hidden></video>
                 <canvas id="detection-preview" width="720" height="450" role="img" aria-label="Animated preview of geometric shapes being detected">Shape detection preview</canvas>
             </div>
         </section>
@@ -111,5 +115,6 @@ java -jar target/shape-sentinel.jar</code></pre>
         </div>
     </footer>
     <script src="app.js"></script>
+    <script src="camera.js"></script>
 </body>
 </html>

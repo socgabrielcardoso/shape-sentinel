@@ -197,6 +197,35 @@ h1 {
     color: var(--accent);
 }
 
+.viewer-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.camera-toggle {
+    min-height: 30px;
+    padding: 0 10px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.camera-toggle:hover,
+.camera-toggle:focus-visible {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.camera-toggle:disabled {
+    cursor: wait;
+    opacity: 0.6;
+}
+
 .live-state::before {
     width: 7px;
     height: 7px;
@@ -373,6 +402,17 @@ h2 {
 
     .footer-row {
         flex-direction: column;
+    }
+
+    .viewer-bar {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 12px 14px;
+    }
+
+    .viewer-actions {
+        width: 100%;
+        justify-content: space-between;
     }
 }
 

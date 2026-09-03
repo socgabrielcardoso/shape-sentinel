@@ -12,6 +12,7 @@ let width = 720;
 let height = 450;
 let animationFrame = 0;
 let lastTime = performance.now();
+let cameraActive = false;
 
 function resizeCanvas() {
     const bounds = canvas.getBoundingClientRect();
@@ -137,6 +138,9 @@ function animate(timestamp) {
 function syncAnimation() {
     cancelAnimationFrame(animationFrame);
     lastTime = performance.now();
+    if (cameraActive) {
+        return;
+    }
     if (motionPreference.matches || document.hidden) {
         drawFrame(0);
     } else {
@@ -152,5 +156,14 @@ if ("ResizeObserver" in window) {
 
 motionPreference.addEventListener("change", syncAnimation);
 document.addEventListener("visibilitychange", syncAnimation);
+document.addEventListener("camera:start", () => {
+    cameraActive = true;
+    cancelAnimationFrame(animationFrame);
+});
+document.addEventListener("camera:stop", () => {
+    cameraActive = false;
+    resizeCanvas();
+    syncAnimation();
+});
 resizeCanvas();
 syncAnimation();
