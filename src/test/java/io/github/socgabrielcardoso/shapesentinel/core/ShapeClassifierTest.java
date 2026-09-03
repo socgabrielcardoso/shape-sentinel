@@ -60,4 +60,26 @@ class ShapeClassifierTest {
         assertEquals(ShapeType.UNKNOWN, result.type());
         assertEquals(0, result.confidence());
     }
+
+    @Test
+    void respectsSquareRatioBoundary() {
+        ShapeAssessment square = classifier.classify(4, 8_600, 372, 100, 86, true);
+        ShapeAssessment rectangle = classifier.classify(4, 8_500, 370, 100, 85, true);
+
+        assertEquals(ShapeType.SQUARE, square.type());
+        assertEquals(ShapeType.RECTANGLE, rectangle.type());
+    }
+
+    @Test
+    void respectsCircleCircularityBoundary() {
+        double perimeter = 100;
+        double circleArea = 0.76 * perimeter * perimeter / (4 * Math.PI);
+        double polygonArea = 0.75 * perimeter * perimeter / (4 * Math.PI);
+
+        ShapeAssessment circle = classifier.classify(10, circleArea, perimeter, 30, 30, true);
+        ShapeAssessment polygon = classifier.classify(10, polygonArea, perimeter, 30, 30, true);
+
+        assertEquals(ShapeType.CIRCLE, circle.type());
+        assertEquals(ShapeType.POLYGON, polygon.type());
+    }
 }
