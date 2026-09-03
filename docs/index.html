@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Shape Sentinel is a Java 17 and OpenCV desktop project for real-time geometric shape detection.">
+    <meta name="theme-color" content="#0b0e13">
+    <title>Shape Sentinel | Java Computer Vision</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="site-header">
+        <nav class="nav shell" aria-label="Main navigation">
+            <a class="brand" href="#top" aria-label="Shape Sentinel home">
+                <span class="brand-mark" aria-hidden="true">△</span>
+                <span>SHAPE SENTINEL</span>
+            </a>
+            <div class="nav-links">
+                <a href="#pipeline">Pipeline</a>
+                <a href="#project">Project</a>
+                <a class="repo-link" href="https://github.com/socgabrielcardoso/shape-sentinel">GitHub ↗</a>
+            </div>
+        </nav>
+    </header>
+
+    <main id="top">
+        <section class="hero shell">
+            <div>
+                <p class="eyebrow">Java 17 · OpenCV · Swing</p>
+                <h1>Real-time shape detection, kept simple.</h1>
+                <p class="lead">A desktop project built to keep my Java practice sharp. It reads a webcam, finds contours and labels common geometric shapes in real time.</p>
+                <div class="actions">
+                    <a class="button primary" href="https://github.com/socgabrielcardoso/shape-sentinel">View source</a>
+                    <a class="button" href="#pipeline">See the pipeline</a>
+                </div>
+            </div>
+
+            <div class="viewer" aria-label="Shape detection interface preview">
+                <div class="viewer-bar">
+                    <span>camera.preview</span>
+                    <span class="live-state">SIMULATED FEED</span>
+                </div>
+                <canvas id="detection-preview" width="720" height="450" role="img" aria-label="Animated preview of geometric shapes being detected">Shape detection preview</canvas>
+            </div>
+        </section>
+
+        <section class="section" id="pipeline">
+            <div class="shell">
+                <div class="section-heading">
+                    <h2>Detection pipeline</h2>
+                    <p>The webcam frame stays local. OpenCV prepares the image, isolates contours and sends the geometry to a small classifier.</p>
+                </div>
+                <div class="pipeline">
+                    <article class="step">
+                        <span class="step-index">01</span>
+                        <h3>Capture</h3>
+                        <p>Read frames from the selected camera.</p>
+                    </article>
+                    <article class="step">
+                        <span class="step-index">02</span>
+                        <h3>Edges</h3>
+                        <p>Apply blur, Canny and morphological closing.</p>
+                    </article>
+                    <article class="step">
+                        <span class="step-index">03</span>
+                        <h3>Contours</h3>
+                        <p>Approximate polygons and measure their geometry.</p>
+                    </article>
+                    <article class="step">
+                        <span class="step-index">04</span>
+                        <h3>Classify</h3>
+                        <p>Label each supported shape with confidence.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="project">
+            <div class="shell">
+                <div class="section-heading">
+                    <h2>Small scope. Real implementation.</h2>
+                    <p>No cloud service and no external processing. The app is a focused Java desktop exercise with native OpenCV bindings, unit tests and an automated build.</p>
+                </div>
+                <div class="details-grid">
+                    <article class="info-card">
+                        <h3>Detected shapes</h3>
+                        <div class="tags" aria-label="Supported shapes">
+                            <span class="tag">Triangle</span>
+                            <span class="tag">Square</span>
+                            <span class="tag">Rectangle</span>
+                            <span class="tag">Pentagon</span>
+                            <span class="tag">Hexagon</span>
+                            <span class="tag">Circle</span>
+                            <span class="tag">Polygon</span>
+                        </div>
+                    </article>
+                    <article class="info-card">
+                        <h3>Run locally</h3>
+                        <pre class="terminal"><code>mvn clean package
+java -jar target/shape-sentinel.jar</code></pre>
+                    </article>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-row shell">
+            <span>Gabriel Cardoso</span>
+            <span>Java and computer vision practice.</span>
+        </div>
+    </footer>
+</body>
+</html>
