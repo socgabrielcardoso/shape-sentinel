@@ -64,6 +64,7 @@ public final class MainWindow extends JFrame implements CameraService.FrameListe
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         setMinimumSize(new Dimension(900, 640));
         setSize(1120, 780);
+        setIconImage(AppIcon.create());
         setLocationRelativeTo(null);
         getContentPane().setBackground(AppTheme.BACKGROUND);
     }
