@@ -1,7 +1,6 @@
 package io.github.socgabrielcardoso.shapesentinel.ui;
 
 import javax.swing.JPanel;
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -13,7 +12,7 @@ final class VideoPanel extends JPanel {
     private volatile BufferedImage frame;
 
     VideoPanel() {
-        setBackground(new Color(11, 14, 19));
+        setBackground(AppTheme.VIDEO_BACKGROUND);
     }
 
     void setFrame(BufferedImage frame) {
@@ -55,14 +54,14 @@ final class VideoPanel extends JPanel {
     private void paintWaitingState(Graphics2D canvas) {
         String title = "SHAPE SENTINEL";
         String subtitle = "Waiting for camera";
-        canvas.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        canvas.setFont(AppTheme.font(Font.BOLD, 24));
         FontMetrics titleMetrics = canvas.getFontMetrics();
-        canvas.setColor(new Color(78, 224, 181));
+        canvas.setColor(AppTheme.ACCENT);
         canvas.drawString(title, (getWidth() - titleMetrics.stringWidth(title)) / 2, getHeight() / 2 - 6);
 
-        canvas.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        canvas.setFont(AppTheme.font(Font.PLAIN, 14));
         FontMetrics subtitleMetrics = canvas.getFontMetrics();
-        canvas.setColor(new Color(132, 142, 158));
+        canvas.setColor(AppTheme.MUTED);
         canvas.drawString(
                 subtitle,
                 (getWidth() - subtitleMetrics.stringWidth(subtitle)) / 2,

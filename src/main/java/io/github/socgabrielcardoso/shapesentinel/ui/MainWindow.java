@@ -14,7 +14,6 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -26,12 +25,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 public final class MainWindow extends JFrame implements CameraService.FrameListener {
-    private static final Color BACKGROUND = new Color(17, 21, 28);
-    private static final Color PANEL = new Color(25, 30, 39);
-    private static final Color TEXT = new Color(235, 239, 245);
-    private static final Color MUTED = new Color(137, 147, 163);
-    private static final Color ACCENT = new Color(78, 224, 181);
-
     private final AtomicReference<DetectionSettings> settings =
             new AtomicReference<>(DetectionSettings.defaults());
     private final AtomicReference<FrameUpdate> pendingFrame = new AtomicReference<>();
@@ -58,11 +51,11 @@ public final class MainWindow extends JFrame implements CameraService.FrameListe
     }
 
     private void configureLookAndFeel() {
-        UIManager.put("Button.font", new Font("Segoe UI", Font.BOLD, 12));
-        UIManager.put("Label.font", new Font("Segoe UI", Font.PLAIN, 12));
-        UIManager.put("Slider.background", PANEL);
-        UIManager.put("Slider.foreground", ACCENT);
-        UIManager.put("Spinner.background", PANEL);
+        UIManager.put("Button.font", AppTheme.font(Font.BOLD, 12));
+        UIManager.put("Label.font", AppTheme.font(Font.PLAIN, 12));
+        UIManager.put("Slider.background", AppTheme.SURFACE);
+        UIManager.put("Slider.foreground", AppTheme.ACCENT);
+        UIManager.put("Spinner.background", AppTheme.SURFACE);
     }
 
     private void configureWindow() {
@@ -70,12 +63,12 @@ public final class MainWindow extends JFrame implements CameraService.FrameListe
         setMinimumSize(new Dimension(900, 640));
         setSize(1120, 780);
         setLocationRelativeTo(null);
-        getContentPane().setBackground(BACKGROUND);
+        getContentPane().setBackground(AppTheme.BACKGROUND);
     }
 
     private JPanel buildContent() {
         JPanel root = new JPanel(new BorderLayout(0, 0));
-        root.setBackground(BACKGROUND);
+        root.setBackground(AppTheme.BACKGROUND);
         root.add(buildHeader(), BorderLayout.NORTH);
         root.add(videoPanel, BorderLayout.CENTER);
         root.add(buildFooter(), BorderLayout.SOUTH);
@@ -84,16 +77,16 @@ public final class MainWindow extends JFrame implements CameraService.FrameListe
 
     private JPanel buildHeader() {
         JPanel header = new JPanel(new BorderLayout());
-        header.setBackground(PANEL);
+        header.setBackground(AppTheme.SURFACE);
         header.setBorder(BorderFactory.createEmptyBorder(16, 22, 16, 22));
 
         JLabel title = new JLabel("SHAPE SENTINEL");
-        title.setForeground(TEXT);
-        title.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        title.setForeground(AppTheme.TEXT);
+        title.setFont(AppTheme.font(Font.BOLD, 20));
 
         JLabel mode = new JLabel("REAL-TIME COMPUTER VISION");
-        mode.setForeground(ACCENT);
-        mode.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        mode.setForeground(AppTheme.ACCENT);
+        mode.setFont(AppTheme.font(Font.BOLD, 11));
 
         header.add(title, BorderLayout.WEST);
         header.add(mode, BorderLayout.EAST);
@@ -102,7 +95,7 @@ public final class MainWindow extends JFrame implements CameraService.FrameListe
 
     private JPanel buildFooter() {
         JPanel footer = new JPanel(new BorderLayout());
-        footer.setBackground(PANEL);
+        footer.setBackground(AppTheme.SURFACE);
         footer.setBorder(BorderFactory.createEmptyBorder(12, 18, 12, 18));
 
         JPanel controls = new JPanel(new FlowLayout(FlowLayout.LEFT, 14, 0));
@@ -127,8 +120,8 @@ public final class MainWindow extends JFrame implements CameraService.FrameListe
         styleButton(cameraButton);
         controls.add(cameraButton);
 
-        status.setForeground(MUTED);
-        status.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        status.setForeground(AppTheme.MUTED);
+        status.setFont(AppTheme.font(Font.PLAIN, 12));
 
         areaSlider.addChangeListener(event -> updateSettings(areaSlider, edgeSlider));
         edgeSlider.addChangeListener(event -> updateSettings(areaSlider, edgeSlider));
@@ -141,8 +134,8 @@ public final class MainWindow extends JFrame implements CameraService.FrameListe
 
     private JLabel label(String text) {
         JLabel label = new JLabel(text);
-        label.setForeground(MUTED);
-        label.setFont(new Font("Segoe UI", Font.BOLD, 10));
+        label.setForeground(AppTheme.MUTED);
+        label.setFont(AppTheme.font(Font.BOLD, 10));
         return label;
     }
 
@@ -153,13 +146,13 @@ public final class MainWindow extends JFrame implements CameraService.FrameListe
     }
 
     private void styleValue(JLabel value) {
-        value.setForeground(TEXT);
-        value.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        value.setForeground(AppTheme.TEXT);
+        value.setFont(AppTheme.font(Font.BOLD, 11));
     }
 
     private void styleButton(JButton button) {
-        button.setBackground(ACCENT);
-        button.setForeground(new Color(12, 31, 26));
+        button.setBackground(AppTheme.ACCENT);
+        button.setForeground(AppTheme.ACCENT_INK);
         button.setFocusPainted(false);
         button.setBorder(BorderFactory.createEmptyBorder(9, 14, 9, 14));
     }
