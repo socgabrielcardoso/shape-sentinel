@@ -22,6 +22,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 public final class MainWindow extends JFrame implements CameraService.FrameListener {
@@ -33,6 +34,8 @@ public final class MainWindow extends JFrame implements CameraService.FrameListe
 
     private final AtomicReference<DetectionSettings> settings =
             new AtomicReference<>(DetectionSettings.defaults());
+    private final AtomicReference<FrameUpdate> pendingFrame = new AtomicReference<>();
+    private final AtomicBoolean frameUpdateScheduled = new AtomicBoolean();
     private final VideoPanel videoPanel = new VideoPanel();
     private final JLabel status = new JLabel("Initializing camera");
     private final JLabel areaValue = new JLabel("1200 px");
@@ -192,8 +195,21 @@ public final class MainWindow extends JFrame implements CameraService.FrameListe
 
     @Override
     public void onFrame(BufferedImage image, CameraService.FrameStats stats) {
-        SwingUtilities.invokeLater(() -> {
-            videoPanel.setFrame(image);
+        pendingFrame.set(new FrameUpdate(image, stats));
+        scheduleFrameUpdate();
+    }
+
+    private void scheduleFrameUpdate() {
+        if (frameUpdateScheduled.compareAndSet(false, true)) {
+            SwingUtilities.invokeLater(this::renderPendingFrame);
+        }
+    }
+
+    private void renderPendingFrame() {
+        FrameUpdate update = pendingFrame.getAndSet(null);
+        if (update != null) {
+            videoPanel.setFrame(update.image());
+            CameraService.FrameStats stats = update.stats();
             status.setText(String.format(
                     Locale.ROOT,
                     "Camera %d  |  %dx%d  |  %.1f FPS  |  %d shapes",
@@ -203,7 +219,11 @@ public final class MainWindow extends JFrame implements CameraService.FrameListe
                     stats.fps(),
                     stats.shapes()
             ));
-        });
+        }
+        frameUpdateScheduled.set(false);
+        if (pendingFrame.get() != null) {
+            scheduleFrameUpdate();
+        }
     }
 
     @Override
@@ -212,5 +232,8 @@ public final class MainWindow extends JFrame implements CameraService.FrameListe
             status.setText(message);
             cameraButton.setText(active ? "STOP CAMERA" : "START CAMERA");
         });
+    }
+
+    private record FrameUpdate(BufferedImage image, CameraService.FrameStats stats) {
     }
 }
