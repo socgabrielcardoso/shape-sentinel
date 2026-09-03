@@ -33,59 +33,69 @@ public final class FrameProcessor implements AutoCloseable {
         List<MatOfPoint> contours = new ArrayList<>();
         Mat hierarchy = new Mat();
         Mat contourInput = edges.clone();
-        Imgproc.findContours(contourInput, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+        try {
+            Imgproc.findContours(
+                    contourInput,
+                    contours,
+                    hierarchy,
+                    Imgproc.RETR_EXTERNAL,
+                    Imgproc.CHAIN_APPROX_SIMPLE
+            );
+            int detected = countDetections(frame, settings, contours);
+            drawMetrics(frame, detected, fps);
+            return detected;
+        } finally {
+            contourInput.release();
+            hierarchy.release();
+            contours.forEach(MatOfPoint::release);
+        }
+    }
 
+    private int countDetections(Mat frame, DetectionSettings settings, List<MatOfPoint> contours) {
         int detected = 0;
         double frameArea = frame.width() * (double) frame.height();
 
         for (MatOfPoint contour : contours) {
+            double area = Imgproc.contourArea(contour);
+            if (area < settings.minimumArea() || area > frameArea * 0.95) {
+                continue;
+            }
+
+            MatOfPoint2f curve = new MatOfPoint2f(contour.toArray());
+            MatOfPoint2f approximation = new MatOfPoint2f();
             try {
-                double area = Imgproc.contourArea(contour);
-                if (area < settings.minimumArea() || area > frameArea * 0.95) {
-                    continue;
-                }
+                double perimeter = Imgproc.arcLength(curve, true);
+                Imgproc.approxPolyDP(curve, approximation, perimeter * 0.025, true);
 
-                MatOfPoint2f curve = new MatOfPoint2f(contour.toArray());
-                MatOfPoint2f approximation = new MatOfPoint2f();
+                MatOfPoint polygon = new MatOfPoint(approximation.toArray());
                 try {
-                    double perimeter = Imgproc.arcLength(curve, true);
-                    Imgproc.approxPolyDP(curve, approximation, perimeter * 0.025, true);
+                    RotatedRect box = Imgproc.minAreaRect(approximation);
+                    boolean convex = Imgproc.isContourConvex(polygon);
+                    ShapeAssessment assessment = classifier.classify(
+                            (int) approximation.total(),
+                            area,
+                            perimeter,
+                            box.size.width,
+                            box.size.height,
+                            convex
+                    );
 
-                    MatOfPoint polygon = new MatOfPoint(approximation.toArray());
-                    try {
-                        RotatedRect box = Imgproc.minAreaRect(approximation);
-                        boolean convex = Imgproc.isContourConvex(polygon);
-                        ShapeAssessment assessment = classifier.classify(
-                                (int) approximation.total(),
-                                area,
-                                perimeter,
-                                box.size.width,
-                                box.size.height,
-                                convex
-                        );
-
-                        if (assessment.type() == ShapeType.UNKNOWN) {
-                            continue;
-                        }
-
-                        Rect bounds = Imgproc.boundingRect(polygon);
-                        drawDetection(frame, contour, bounds, assessment, area);
-                        detected++;
-                    } finally {
-                        polygon.release();
+                    if (assessment.type() == ShapeType.UNKNOWN) {
+                        continue;
                     }
+
+                    Rect bounds = Imgproc.boundingRect(polygon);
+                    drawDetection(frame, contour, bounds, assessment, area);
+                    detected++;
                 } finally {
-                    curve.release();
-                    approximation.release();
+                    polygon.release();
                 }
             } finally {
-                contour.release();
+                curve.release();
+                approximation.release();
             }
         }
 
-        contourInput.release();
-        hierarchy.release();
-        drawMetrics(frame, detected, fps);
         return detected;
     }
 
