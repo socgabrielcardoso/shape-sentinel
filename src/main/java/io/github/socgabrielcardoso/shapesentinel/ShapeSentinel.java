@@ -14,13 +14,21 @@ public final class ShapeSentinel {
         try {
             OpenCV.loadLocally();
             SwingUtilities.invokeLater(() -> new MainWindow().open());
-        } catch (Throwable error) {
-            JOptionPane.showMessageDialog(
-                    null,
-                    "OpenCV could not be initialized: " + error.getMessage(),
-                    "Shape Sentinel",
-                    JOptionPane.ERROR_MESSAGE
-            );
+        } catch (RuntimeException | LinkageError error) {
+            SwingUtilities.invokeLater(() -> showStartupError(error));
         }
+    }
+
+    private static void showStartupError(Throwable error) {
+        String detail = error.getMessage();
+        if (detail == null || detail.isBlank()) {
+            detail = error.getClass().getSimpleName();
+        }
+        JOptionPane.showMessageDialog(
+                null,
+                "OpenCV could not be initialized: " + detail,
+                "Shape Sentinel",
+                JOptionPane.ERROR_MESSAGE
+        );
     }
 }
