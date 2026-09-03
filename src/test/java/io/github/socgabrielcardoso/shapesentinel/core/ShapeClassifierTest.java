@@ -73,8 +73,8 @@ class ShapeClassifierTest {
     @Test
     void respectsCircleCircularityBoundary() {
         double perimeter = 100;
-        double circleArea = 0.76 * perimeter * perimeter / (4 * Math.PI);
-        double polygonArea = 0.75 * perimeter * perimeter / (4 * Math.PI);
+        double circleArea = 0.761 * perimeter * perimeter / (4 * Math.PI);
+        double polygonArea = 0.759 * perimeter * perimeter / (4 * Math.PI);
 
         ShapeAssessment circle = classifier.classify(10, circleArea, perimeter, 30, 30, true);
         ShapeAssessment polygon = classifier.classify(10, polygonArea, perimeter, 30, 30, true);
