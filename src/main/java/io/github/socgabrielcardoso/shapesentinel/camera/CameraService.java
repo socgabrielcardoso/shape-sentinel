@@ -7,11 +7,11 @@ import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.Videoio;
 
 import java.awt.image.BufferedImage;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.function.Supplier;
-import java.util.Objects;
 
 public final class CameraService implements AutoCloseable {
     private final Supplier<DetectionSettings> settingsSupplier;
@@ -71,41 +71,41 @@ public final class CameraService implements AutoCloseable {
             }
 
             try (FrameProcessor processor = new FrameProcessor()) {
-            if (!camera.open(cameraIndex)) {
-                publishState(session, "Camera " + cameraIndex + " is unavailable", false);
-                return;
-            }
-
-            camera.set(Videoio.CAP_PROP_FRAME_WIDTH, 1280);
-            camera.set(Videoio.CAP_PROP_FRAME_HEIGHT, 720);
-            publishState(session, "Camera " + cameraIndex + " connected", true);
-
-            long windowStart = System.nanoTime();
-            int windowFrames = 0;
-            double fps = 0;
-
-            while (running && session == sessionId && !Thread.currentThread().isInterrupted()) {
-                if (!camera.read(frame) || frame.empty()) {
-                    publishState(session, "Camera stream interrupted", false);
-                    break;
+                if (!camera.open(cameraIndex)) {
+                    publishState(session, "Camera " + cameraIndex + " is unavailable", false);
+                    return;
                 }
 
-                windowFrames++;
-                long elapsed = System.nanoTime() - windowStart;
-                if (elapsed >= 500_000_000L) {
-                    fps = windowFrames * 1_000_000_000.0 / elapsed;
-                    windowFrames = 0;
-                    windowStart = System.nanoTime();
-                }
+                camera.set(Videoio.CAP_PROP_FRAME_WIDTH, 1280);
+                camera.set(Videoio.CAP_PROP_FRAME_HEIGHT, 720);
+                publishState(session, "Camera " + cameraIndex + " connected", true);
 
-                int shapes = processor.process(frame, settingsSupplier.get(), fps);
-                BufferedImage image = MatImages.toBufferedImage(frame);
-                publishFrame(
-                        session,
-                        image,
-                        new FrameStats(cameraIndex, frame.width(), frame.height(), shapes, fps)
-                );
-            }
+                long windowStart = System.nanoTime();
+                int windowFrames = 0;
+                double fps = 0;
+
+                while (running && session == sessionId && !Thread.currentThread().isInterrupted()) {
+                    if (!camera.read(frame) || frame.empty()) {
+                        publishState(session, "Camera stream interrupted", false);
+                        break;
+                    }
+
+                    windowFrames++;
+                    long elapsed = System.nanoTime() - windowStart;
+                    if (elapsed >= 500_000_000L) {
+                        fps = windowFrames * 1_000_000_000.0 / elapsed;
+                        windowFrames = 0;
+                        windowStart = System.nanoTime();
+                    }
+
+                    int shapes = processor.process(frame, settingsSupplier.get(), fps);
+                    BufferedImage image = MatImages.toBufferedImage(frame);
+                    publishFrame(
+                            session,
+                            image,
+                            new FrameStats(cameraIndex, frame.width(), frame.height(), shapes, fps)
+                    );
+                }
             }
         } catch (RuntimeException error) {
             publishState(session, "Camera error: " + error.getMessage(), false);
