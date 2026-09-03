@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.function.Supplier;
+import java.util.Objects;
 
 public final class CameraService implements AutoCloseable {
     private final Supplier<DetectionSettings> settingsSupplier;
@@ -22,11 +23,14 @@ public final class CameraService implements AutoCloseable {
     private ExecutorService executor;
 
     public CameraService(Supplier<DetectionSettings> settingsSupplier, FrameListener listener) {
-        this.settingsSupplier = settingsSupplier;
-        this.listener = listener;
+        this.settingsSupplier = Objects.requireNonNull(settingsSupplier, "settingsSupplier");
+        this.listener = Objects.requireNonNull(listener, "listener");
     }
 
     public synchronized void start(int cameraIndex) {
+        if (cameraIndex < 0) {
+            throw new IllegalArgumentException("Camera index must not be negative");
+        }
         stop();
         long session = ++sessionId;
         running = true;
@@ -59,18 +63,22 @@ public final class CameraService implements AutoCloseable {
 
     private void capture(int cameraIndex, long session) {
         VideoCapture camera = new VideoCapture();
-        activeCapture = camera;
         Mat frame = new Mat();
 
-        try (FrameProcessor processor = new FrameProcessor()) {
+        try {
+            if (!registerCapture(camera, session)) {
+                return;
+            }
+
+            try (FrameProcessor processor = new FrameProcessor()) {
             if (!camera.open(cameraIndex)) {
-                listener.onState("Camera " + cameraIndex + " is unavailable", false);
+                publishState(session, "Camera " + cameraIndex + " is unavailable", false);
                 return;
             }
 
             camera.set(Videoio.CAP_PROP_FRAME_WIDTH, 1280);
             camera.set(Videoio.CAP_PROP_FRAME_HEIGHT, 720);
-            listener.onState("Camera " + cameraIndex + " connected", true);
+            publishState(session, "Camera " + cameraIndex + " connected", true);
 
             long windowStart = System.nanoTime();
             int windowFrames = 0;
@@ -78,7 +86,7 @@ public final class CameraService implements AutoCloseable {
 
             while (running && session == sessionId && !Thread.currentThread().isInterrupted()) {
                 if (!camera.read(frame) || frame.empty()) {
-                    listener.onState("Camera stream interrupted", false);
+                    publishState(session, "Camera stream interrupted", false);
                     break;
                 }
 
@@ -92,22 +100,48 @@ public final class CameraService implements AutoCloseable {
 
                 int shapes = processor.process(frame, settingsSupplier.get(), fps);
                 BufferedImage image = MatImages.toBufferedImage(frame);
-                listener.onFrame(
+                publishFrame(
+                        session,
                         image,
                         new FrameStats(cameraIndex, frame.width(), frame.height(), shapes, fps)
                 );
             }
+            }
         } catch (RuntimeException error) {
-            listener.onState("Camera error: " + error.getMessage(), false);
+            publishState(session, "Camera error: " + error.getMessage(), false);
         } finally {
             frame.release();
             camera.release();
-            if (activeCapture == camera) {
-                activeCapture = null;
-            }
-            if (session == sessionId) {
-                running = false;
-            }
+            finishCapture(camera, session);
+        }
+    }
+
+    private synchronized boolean registerCapture(VideoCapture camera, long session) {
+        if (!running || session != sessionId) {
+            return false;
+        }
+        activeCapture = camera;
+        return true;
+    }
+
+    private synchronized void finishCapture(VideoCapture camera, long session) {
+        if (activeCapture == camera) {
+            activeCapture = null;
+        }
+        if (session == sessionId) {
+            running = false;
+        }
+    }
+
+    private void publishFrame(long session, BufferedImage image, FrameStats stats) {
+        if (running && session == sessionId) {
+            listener.onFrame(image, stats);
+        }
+    }
+
+    private void publishState(long session, String message, boolean active) {
+        if (running && session == sessionId) {
+            listener.onState(message, active);
         }
     }
 
