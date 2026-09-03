@@ -7,12 +7,18 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
 
 jobs:
   verify:
+    name: Verify Java 17
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -22,4 +28,5 @@ jobs:
           distribution: temurin
           java-version: '17'
           cache: maven
-      - run: mvn --batch-mode --no-transfer-progress verify
+      - run: mvn --batch-mode --no-transfer-progress clean verify
+      - run: test -f target/shape-sentinel.jar
