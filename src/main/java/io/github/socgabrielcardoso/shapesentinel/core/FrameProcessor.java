@@ -119,10 +119,18 @@ public final class FrameProcessor implements AutoCloseable {
 
         int[] baseline = new int[1];
         Size textSize = Imgproc.getTextSize(text, Imgproc.FONT_HERSHEY_SIMPLEX, 0.55, 1, baseline);
-        int x = Math.max(4, bounds.x);
-        int textY = bounds.y > 34 ? bounds.y - 8 : bounds.y + 28;
+        int labelWidth = (int) Math.ceil(textSize.width);
+        int labelHeight = (int) Math.ceil(textSize.height);
+        int maxX = Math.max(4, frame.width() - labelWidth - 6);
+        int x = clamp(bounds.x, 4, maxX);
+        int preferredY = bounds.y > labelHeight + 16 ? bounds.y - 8 : bounds.y + labelHeight + 12;
+        int maxY = Math.max(labelHeight + 7, frame.height() - baseline[0] - 5);
+        int textY = clamp(preferredY, labelHeight + 7, maxY);
         Point panelStart = new Point(x - 4, textY - textSize.height - 7);
-        Point panelEnd = new Point(x + textSize.width + 5, textY + baseline[0] + 4);
+        Point panelEnd = new Point(
+                Math.min(frame.width() - 1, x + textSize.width + 5),
+                Math.min(frame.height() - 1, textY + baseline[0] + 4)
+        );
 
         Imgproc.rectangle(frame, panelStart, panelEnd, PANEL_COLOR, Imgproc.FILLED);
         Imgproc.putText(
@@ -135,6 +143,10 @@ public final class FrameProcessor implements AutoCloseable {
                 1,
                 Imgproc.LINE_AA
         );
+    }
+
+    private int clamp(int value, int minimum, int maximum) {
+        return Math.max(minimum, Math.min(value, maximum));
     }
 
     private void drawMetrics(Mat frame, int detected, double fps) {
