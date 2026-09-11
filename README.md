@@ -14,3 +14,23 @@ O objetivo é transformar quadros de vídeo em informação geométrica útil, o
 - Testes automatizados com JUnit.
 
 O projeto funciona como uma base para experimentar visão computacional clássica, processamento de imagem e integração entre componentes Java e uma camada visual no navegador.
+
+## Stack
+
+- **Java 17+**
+- **OpenCV 4.9**
+- **Maven 3.9+**
+- **JUnit 5**
+- HTML, CSS e JavaScript para a experiência visual
+
+## Build
+
+```bash
+mvn clean package
+```
+
+O Maven Shade Plugin gera um artefato executável com a classe principal `ShapeSentinel`, simplificando distribuição e execução do projeto.
+
+## Valor técnico
+
+Shape Sentinel foi estruturado para demonstrar fundamentos de computer vision de forma prática: captura, interpretação de contornos, classificação geométrica e apresentação dos resultados em tempo real. É uma base adequada para evoluções futuras em reconhecimento visual, automação e análise de imagens.
