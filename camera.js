@@ -7,6 +7,7 @@ let cameraStream = null;
 let detectorFrame = 0;
 let detectorResources = null;
 let openCvPromise = null;
+let cameraGeneration = 0;
 
 function setCameraStatus(message, buttonText, disabled = false) {
     feedState.textContent = message;
@@ -227,6 +228,8 @@ function releaseDetector() {
 }
 
 function stopCamera() {
+    // Invalidate any pending permission, play or detector load operation.
+    cameraGeneration++;
     releaseDetector();
     cameraStream?.getTracks().forEach(track => track.stop());
     cameraStream = null;
@@ -251,9 +254,10 @@ async function startCamera() {
         return;
     }
 
+    const generation = ++cameraGeneration;
     setCameraStatus("REQUESTING CAMERA", "WAIT", true);
     try {
-        cameraStream = await navigator.mediaDevices.getUserMedia({
+        const stream = await navigator.mediaDevices.getUserMedia({
             audio: false,
             video: {
                 facingMode: "environment",
@@ -261,15 +265,23 @@ async function startCamera() {
                 height: { ideal: 800 }
             }
         });
-        cameraSource.srcObject = cameraStream;
+        if (generation !== cameraGeneration) {
+            stream.getTracks().forEach(track => track.stop());
+            return;
+        }
+        cameraStream = stream;
+        cameraSource.srcObject = stream;
         await cameraSource.play();
+        if (generation !== cameraGeneration) return;
         setCameraStatus("LOADING DETECTOR", "WAIT", true);
         const cv = await loadOpenCv();
+        if (generation !== cameraGeneration) return;
         detectorResources = createDetectorResources(cv);
         document.dispatchEvent(new Event("camera:start"));
         setCameraStatus("LIVE CAMERA", "STOP CAMERA");
         processCameraFrame();
     } catch (error) {
+        if (generation !== cameraGeneration) return;
         releaseDetector();
         openCvPromise = null;
         cameraStream?.getTracks().forEach(track => track.stop());
