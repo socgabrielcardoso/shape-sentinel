@@ -30,3 +30,8 @@ jobs:
           cache: maven
       - run: mvn --batch-mode --no-transfer-progress clean verify
       - run: test -f target/shape-sentinel.jar
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: node --check camera.js
+      - run: node --test tests/camera-lifecycle.test.mjs
