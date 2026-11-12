@@ -31,4 +31,10 @@ class ShapeClassifierHardeningTest {
         assertEquals(ShapeType.POLYGON, classifier.classify(5, 200, 70, 30, 30, false).type());
     }
 
+
+    @Test
+    void rejectsImpossibleCircularityAboveOne() {
+        assertEquals(ShapeType.UNKNOWN, classifier.classify(9, 10000, 100, 200, 200, true).type());
+    }
+
 }
