@@ -58,4 +58,10 @@ class ShapeClassifierHardeningTest {
         assertEquals(ShapeType.UNKNOWN, classifier.classify(4, 100, 50, Double.POSITIVE_INFINITY, 20, true).type());
     }
 
+
+    @Test
+    void rejectsNonFinitePerimeterBeforeDivision() {
+        assertEquals(ShapeType.UNKNOWN, classifier.classify(8, 100, Double.NaN, 20, 20, true).type());
+    }
+
 }
