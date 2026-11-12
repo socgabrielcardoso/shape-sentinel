@@ -19,4 +19,10 @@ class ShapeClassifierHardeningTest {
         assertEquals(ShapeType.SQUARE, classifier.classify(4, 10200, 400, 100, 100, true).type());
     }
 
+
+    @Test
+    void rejectsImpossibleConcaveTriangles() {
+        assertEquals(ShapeType.UNKNOWN, classifier.classify(3, 120, 60, 20, 20, false).type());
+    }
+
 }
