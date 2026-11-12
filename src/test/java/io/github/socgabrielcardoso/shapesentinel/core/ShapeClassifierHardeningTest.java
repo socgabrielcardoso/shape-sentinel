@@ -25,4 +25,10 @@ class ShapeClassifierHardeningTest {
         assertEquals(ShapeType.UNKNOWN, classifier.classify(3, 120, 60, 20, 20, false).type());
     }
 
+
+    @Test
+    void treatsConcaveFiveSidedContoursAsGenericPolygons() {
+        assertEquals(ShapeType.POLYGON, classifier.classify(5, 200, 70, 30, 30, false).type());
+    }
+
 }
