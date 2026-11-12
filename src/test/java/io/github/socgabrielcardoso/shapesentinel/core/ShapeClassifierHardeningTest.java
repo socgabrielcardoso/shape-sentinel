@@ -44,4 +44,12 @@ class ShapeClassifierHardeningTest {
         assertEquals(ShapeType.POLYGON, classifier.classify(9, area, 100, 50, 50, true).type());
     }
 
+
+    @Test
+    void keepsHighCircularityConfidenceInsideProbabilityRange() {
+        double area = 0.999 * 100 * 100 / (4 * Math.PI);
+        ShapeAssessment result = classifier.classify(12, area, 100, 50, 50, true);
+        assertTrue(result.confidence() <= 1 && result.confidence() > 0.95);
+    }
+
 }
