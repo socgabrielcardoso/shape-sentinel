@@ -13,6 +13,9 @@ public final class ShapeClassifier {
             return new ShapeAssessment(ShapeType.UNKNOWN, 0);
         }
 
+        if (!convex && vertices == 3) {
+            return new ShapeAssessment(ShapeType.UNKNOWN, 0);
+        }
         if (!convex) {
             return new ShapeAssessment(ShapeType.POLYGON, 0.68);
         }
@@ -36,6 +39,9 @@ public final class ShapeClassifier {
 
     private ShapeAssessment classifyRoundedShape(double area, double perimeter) {
         double circularity = 4 * Math.PI * area / (perimeter * perimeter);
+        if (!Double.isFinite(circularity) || circularity > 1.05) {
+            return new ShapeAssessment(ShapeType.UNKNOWN, 0);
+        }
         if (circularity >= 0.76) {
             double confidence = 0.78 + Math.min(1, circularity) * 0.2;
             return new ShapeAssessment(ShapeType.CIRCLE, confidence);
@@ -49,6 +55,7 @@ public final class ShapeClassifier {
                 || !Double.isFinite(width)
                 || !Double.isFinite(height)
                 || area <= 0
+                || area > width * height * 1.05
                 || perimeter <= 0
                 || width <= 0
                 || height <= 0;
