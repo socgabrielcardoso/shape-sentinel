@@ -37,4 +37,11 @@ class ShapeClassifierHardeningTest {
         assertEquals(ShapeType.UNKNOWN, classifier.classify(9, 10000, 100, 200, 200, true).type());
     }
 
+
+    @Test
+    void doesNotConfuseLowCircularityWithCircularObjects() {
+        double area = 0.5 * 100 * 100 / (4 * Math.PI);
+        assertEquals(ShapeType.POLYGON, classifier.classify(9, area, 100, 50, 50, true).type());
+    }
+
 }
