@@ -49,6 +49,7 @@ public final class ShapeClassifier {
                 || !Double.isFinite(width)
                 || !Double.isFinite(height)
                 || area <= 0
+                || area > width * height * 1.05
                 || perimeter <= 0
                 || width <= 0
                 || height <= 0;
