@@ -13,6 +13,9 @@ public final class ShapeClassifier {
             return new ShapeAssessment(ShapeType.UNKNOWN, 0);
         }
 
+        if (!convex && vertices == 3) {
+            return new ShapeAssessment(ShapeType.UNKNOWN, 0);
+        }
         if (!convex) {
             return new ShapeAssessment(ShapeType.POLYGON, 0.68);
         }
