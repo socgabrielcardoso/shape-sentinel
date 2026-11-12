@@ -52,4 +52,10 @@ class ShapeClassifierHardeningTest {
         assertTrue(result.confidence() <= 1 && result.confidence() > 0.95);
     }
 
+
+    @Test
+    void rejectsNonFiniteBoundingDimensions() {
+        assertEquals(ShapeType.UNKNOWN, classifier.classify(4, 100, 50, Double.POSITIVE_INFINITY, 20, true).type());
+    }
+
 }
